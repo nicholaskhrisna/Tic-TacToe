@@ -4,7 +4,7 @@ from tkinter import *
 import socket,threading
 from tkinter import messagebox
 
-#membuat window GUI untuk bermain
+# Penggunaan Tkinter
 win = Tk()
 
 playerAktif = False
@@ -56,14 +56,19 @@ def run():
 
 clientThread(run)
 
-win.title("pemain 2 - tic tac toe oleh 6181801030 and 6181801060")
-win.geometry("400x400")
 
-pemain1 = Label(win, text="pemain 1: X")
+# GUI---------------------------------------------
+win.title("Tic-Tac-Toe (Pemain 2 : O)")
+win.geometry("400x200")
+
+pemain1 = Label(win, text="Pemain 1 (Server) : X")
 pemain1.grid(row=1, column=0)
-pemain2 = Label(win, text="pemain2 2: O")
+pemain2 = Label(win, text="Pemain 2 (Client) : O")
 pemain2.grid(row=2, column=0)
+# GUI---------------------------------------------
 
+
+# Fungsi tiap box---------------------------------
 def satuSatu():
     global ans
     global playerAktif
@@ -189,7 +194,10 @@ def tigaTiga():
         rightBottomBtn["text"] = "X"
         playerAktif = True
         check()
+# Fungsi tiap box---------------------------------
 
+
+# Check kondisi menang----------------------------
 temp = 0
 def check():
     global temp
@@ -227,8 +235,7 @@ def check():
         checkMenang(leftBottomBtn["text"])
 
     if temp == 9:
-        messagebox.showinfo("permainan seri")
-        res = messagebox.showinfo("ingin bermain lagi?")
+        messagebox.showinfo("Permainan Seri!")
         win.destroy()
     # if res == 'yes':
     #     return 0 #clientThread(1)
@@ -236,15 +243,18 @@ def check():
     #     sys.exit()
 
 def checkMenang(ins):
-    ans = ins + " menang!"
-    messagebox.showinfo("ingin bermain lagi?", ans)
+    ans = "Pemain " + ins + " menang!"
+    messagebox.showinfo("Permainan Selesai!", ans)
     win.destroy()
     # if res == 'yes':
     #     return 0 #clientThread(1)
     # else:
     #     sys.exit()
 
-#button grid#
+# Check kondisi menang----------------------------
+
+
+# Tampilan box permainan--------------------------
 
 #baris 1
 
@@ -272,3 +282,5 @@ rightBottomBtn = Button(win, text = " ", bg = "white", width = 6, height = 3,  c
 rightBottomBtn.grid(column = 3, row = 3)
 
 win.mainloop()
+
+# Tampilan box permainan--------------------------

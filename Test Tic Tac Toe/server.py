@@ -1,14 +1,13 @@
-#import
-
-from tkinter import *
+# Import
 import socket,threading
+from tkinter import *
 from tkinter import messagebox
 
-#membuat window GUI untuk bermain
+# Penggunaan Tkinter
 win = Tk()
 
-playerAktif = True
-ans = ''
+giliran = True
+box = ''
 
 LOCALHOST = "127.0.0.1"
 PORT = 8080
@@ -21,183 +20,195 @@ server.listen(1)
 print("Server started")
 print("Waiting for client request..")
 
-def clientThread(ins):
+def createThread(ins):
     thread = threading.Thread(target = ins)
     thread.daemon = True
     thread.start()
 
 def run():
-    global playerAktif
-    global ans
+    global giliran
+    global box
     while True:
         temp, clientAddress = clientsock.recvfrom(2048)
         msg = temp.decode()
         splitter = msg.split('-')
-        ans = splitter[0]
+        box = splitter[0]
         update()
         if splitter[1] == 'YourTurn':
-            playerAktif = True
+            giliran = True
             print("giliran pemain 1")
 
 def update():
-    if ans == 'a':
+    if box == 'a':
         satuSatu()
-    elif ans == 'b':
+    elif box == 'b':
         satuDua()
-    elif ans == 'c':
+    elif box == 'c':
         satuTiga()
-    elif ans == 'd':
+    elif box == 'd':
         duaSatu()
-    elif ans == 'e':
+    elif box == 'e':
         duaDua()
-    elif ans == 'f':
+    elif box == 'f':
         duaTiga()
-    elif ans == 'g':
+    elif box == 'g':
         tigaSatu()
-    elif ans == 'h':
+    elif box == 'h':
         tigaDua()
-    elif ans == 'i':
+    elif box == 'i':
         tigaTiga()
 
 def connection():
     global clientsock, clientAddress
     clientsock, clientAddress = server.accept()
     run()
-clientThread(connection)
 
-win.title("pemain 1 - tic tac toe")
-win.geometry("400x400")
-pemain1 = Label(win, text="pemain 1: X")
+createThread(connection)
+
+
+
+# GUI---------------------------------------------
+win.title("Tic-Tac-Toe (Pemain 1 : X)")
+win.geometry("400x300")
+pemain1 = Label(win, text="Pemain 1 (Server) : X")
 pemain1.grid(row=1, column=0)
-pemain2 = Label(win, text="pemain2 2: O")
+pemain2 = Label(win, text="Pemain 2 (Client) : O")
 pemain2.grid(row=2, column=0)
+# GUI---------------------------------------------
 
+
+
+# Fungsi tiap box---------------------------------
 def satuSatu():
-    global ans
-    global playerAktif
-    if leftTopBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if leftTopBtn["text"] == " " and giliran == True:
         leftTopBtn["text"] = "X"
         kirim = '{}-{}'.format('a','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'a' and playerAktif == False:
+    elif box == 'a' and giliran == False:
         leftTopBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
 
 def satuDua():
-    global ans
-    global playerAktif
-    if centerTopBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if centerTopBtn["text"] == " " and giliran == True:
         centerTopBtn["text"] = "X"
         kirim = '{}-{}'.format('b','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'b' and playerAktif == False:
+    elif box == 'b' and giliran == False:
         centerTopBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
 
 def satuTiga():
-    global ans
-    global playerAktif
-    if rightTopBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if rightTopBtn["text"] == " " and giliran == True:
         rightTopBtn["text"] = "X"
         kirim = '{}-{}'.format('c','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'c' and playerAktif == False:
+    elif box == 'c' and giliran == False:
         rightTopBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
 
 def duaSatu():
-    global ans
-    global playerAktif
-    if leftCenterBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if leftCenterBtn["text"] == " " and giliran == True:
         leftCenterBtn["text"] = "X"
         kirim = '{}-{}'.format('d','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'd' and playerAktif == False:
+    elif box == 'd' and giliran == False:
         leftCenterBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
 
 def duaDua():
-    global ans
-    global playerAktif
-    if centerCenterBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if centerCenterBtn["text"] == " " and giliran == True:
         centerCenterBtn["text"] = "X"
         kirim = '{}-{}'.format('e','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'e' and playerAktif == False:
+    elif box == 'e' and giliran == False:
         centerCenterBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
 
 def duaTiga():
-    global ans
-    global playerAktif
-    if rightCenterBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if rightCenterBtn["text"] == " " and giliran == True:
         rightCenterBtn["text"] = "X"
         kirim = '{}-{}'.format('f','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'f' and playerAktif == False:
+    elif box == 'f' and giliran == False:
         rightCenterBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
     
 def tigaSatu():
-    global ans
-    global playerAktif
-    if leftBottomBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if leftBottomBtn["text"] == " " and giliran == True:
         leftBottomBtn["text"] = "X"
         kirim = '{}-{}'.format('g','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'g' and playerAktif == False:
+    elif box == 'g' and giliran == False:
         leftBottomBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
 
 def tigaDua():
-    global ans
-    global playerAktif
-    if centerBottomBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if centerBottomBtn["text"] == " " and giliran == True:
         centerBottomBtn["text"] = "X"
         kirim = '{}-{}'.format('h','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'h' and playerAktif == False:
+    elif box == 'h' and giliran == False:
         centerBottomBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
 
 def tigaTiga():
-    global ans
-    global playerAktif
-    if rightBottomBtn["text"] == " " and playerAktif == True:
+    global box
+    global giliran
+    if rightBottomBtn["text"] == " " and giliran == True:
         rightBottomBtn["text"] = "X"
         kirim = '{}-{}'.format('i','YourTurn').encode()
         clientsock.send(kirim)
-        playerAktif = False
+        giliran = False
         check()
-    elif ans == 'i' and playerAktif == False:
+    elif box == 'i' and giliran == False:
         rightBottomBtn["text"] = "O"
-        playerAktif = True
+        giliran = True
         check()
+# Fungsi tiap box---------------------------------
 
+
+
+# Check kondisi menang----------------------------
 temp = 0
 def check():
     global temp
@@ -235,27 +246,30 @@ def check():
         checkMenang(leftBottomBtn["text"])
 
     if temp == 9:
-        messagebox.showinfo("permainan seri")
+        messagebox.showinfo("Permainan Seri")
         win.destroy()
         # res = messagebox.askquestion("ingin bermain lagi?")
         # if res == 'yes':
-        #     return 1 #clientThread(1)
+        #     return 1 #createThread(1)
         # else:
         #     sys.exit()
 
 def checkMenang(ins):
-    ans = ins + " menang!"
-    messagebox.showinfo("ingin bermain lagi?", ans)
+    ans = "Pemain " + ins + " menang!"
+    messagebox.showinfo("Permainan Selesai!", ans)
     win.destroy()
     # if res == 'yes':
-    #     return 1 #clientThread(1)
+    #     return 1 #createThread(1)
     # else:
     #     sys.exit()
 
-#button grid#
+# Check kondisi menang----------------------------
+
+
+
+# Tampilan box permainan--------------------------
 
 #baris 1
-
 leftTopBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = satuSatu)
 leftTopBtn.grid(column = 1, row = 1)
 centerTopBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = satuDua)
@@ -280,3 +294,5 @@ rightBottomBtn = Button(win, text = " ", bg = "white", width = 6, height = 3,  c
 rightBottomBtn.grid(column = 3, row = 3)
 
 win.mainloop()
+
+# Tampilan box permainan--------------------------
