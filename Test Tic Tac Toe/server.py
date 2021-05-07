@@ -1,296 +1,282 @@
-# Server is player1 and will be the "X"
-
-import socket
-import threading
+#import
 
 from tkinter import *
+import socket,threading
 from tkinter import messagebox
 
-windows = Tk()
+#membuat window GUI untuk bermain
+win = Tk()
 
-cell = ''
-turn = True
+playerAktif = True
+ans = ''
 
-host = '127.0.0.1'  #host address
-port = 65535        #port number
+LOCALHOST = "127.0.0.1"
+PORT = 8080
 
-conn, addr = None, None
+clientsock, clientAddress = None, None
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind((host, port))
-sock.listen(1)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((LOCALHOST, PORT))
+server.listen(1)
+print("Server started")
+print("Waiting for client request..")
 
-def create_thread (targett):
-    thread = threading.Thread(target = targett)
-    thread.daemon = True    #daemon threads are killed automatically when the program exits
+def clientThread(ins):
+    thread = threading.Thread(target = ins)
+    thread.daemon = True
     thread.start()
 
-def receiveData ():
-    global cell
-    global turn
+def run():
+    global playerAktif
+    global ans
     while True:
-        data, addr = conn.recvfrom(1024)    #loop to receive the address and the message
-        data2 = data.decode()
-        dataa = data2.split('-')
-        cell = dataa[0]
+        temp, clientAddress = clientsock.recvfrom(2048)
+        msg = temp.decode()
+        splitter = msg.split('-')
+        ans = splitter[0]
         update()
-        if dataa[1] == 'YourTurn':
-            turn = True
-            print(" server turn = "  + str(turn))
+        if splitter[1] == 'YourTurn':
+            playerAktif = True
+            print("giliran pemain 1")
 
-def update ():
-    if cell == 'A':
-        clicked1()
-    elif cell == 'B':
-        clicked2()
-    elif cell == 'C':
-        clicked3()
-    elif cell == 'D':
-        clicked4()
-    elif cell == 'E':
-        clicked5()
-    elif cell == 'F':
-        clicked6()
-    elif cell == 'G':
-        clicked7()
-    elif cell == 'H':
-        clicked8()
-    elif cell == 'I':
-        clicked9()
-    else:
-        print("no matching char detected")
+def update():
+    if ans == 'a':
+        satuSatu()
+    elif ans == 'b':
+        satuDua()
+    elif ans == 'c':
+        satuTiga()
+    elif ans == 'd':
+        duaSatu()
+    elif ans == 'e':
+        duaDua()
+    elif ans == 'f':
+        duaTiga()
+    elif ans == 'g':
+        tigaSatu()
+    elif ans == 'h':
+        tigaDua()
+    elif ans == 'i':
+        tigaTiga()
 
-def waiting4connection():
-    print("thread created")
-    global conn, addr
-    conn, addr = sock.accept()   #blocking method until a connection is established
-    print("Client is connected ")
-    receiveData()
+def connection():
+    global clientsock, clientAddress
+    clientsock, clientAddress = server.accept()
+    run()
+clientThread(connection)
 
-create_thread(waiting4connection)
+win.title("pemain 1 - tic tac toe")
+win.geometry("400x400")
+pemain1 = Label(win, text="pemain 1: X")
+pemain1.grid(row=1, column=0)
+pemain2 = Label(win, text="pemain2 2: O")
+pemain2.grid(row=2, column=0)
 
-
-windows.title("Welcome player1 to the game Tic-Tac-Toe ")
-windows.geometry("400x300")
-
-lbl = Label(windows, text="Tic-Tac-Toe Game", font=('Helvetica','15'))
-lbl.grid(row=0, column=0)
-
-lbl = Label(windows, text="Player 1: X", font=('Helvetica','10'))
-lbl.grid(row=1, column=0)
-
-lbl = Label(windows, text="Player 2: O", font=('Helvetica','10'))
-lbl.grid(row=2, column=0)
-
-
-def clicked1():
-    global turn
-    global cell
-    if turn == True and btn1["text"] == " " :
-        btn1["text"] = "X"
-        send_data = '{}-{}'.format('A','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
+def satuSatu():
+    global ans
+    global playerAktif
+    if leftTopBtn["text"] == " " and playerAktif == True:
+        leftTopBtn["text"] = "X"
+        kirim = '{}-{}'.format('a','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
         check()
-    elif turn == False and cell == 'A':
-        btn1["text"] = "O"
-        turn = True
+    elif ans == 'a' and playerAktif == False:
+        leftTopBtn["text"] = "O"
+        playerAktif = True
         check()
 
-def clicked2():
-    global turn
-    global cell
-    if turn == True and btn2["text"] == " " :
-        btn2["text"] = "X"
-        send_data = '{}-{}'.format('B','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
+def satuDua():
+    global ans
+    global playerAktif
+    if centerTopBtn["text"] == " " and playerAktif == True:
+        centerTopBtn["text"] = "X"
+        kirim = '{}-{}'.format('b','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
         check()
-    elif turn == False and btn2["text"] == " " and cell == 'B':
-        btn2["text"] = "O"
-        turn = True
-        check()
-
-def clicked3():
-    global turn
-    global cell
-    if turn == True and btn3["text"] == " " :
-        btn3["text"] = "X"
-        send_data = '{}-{}'.format('C','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
-        check()
-    elif turn == False and btn3["text"] == " " and cell == 'C':
-        btn3["text"] = "O"
-        turn = True
+    elif ans == 'b' and playerAktif == False:
+        centerTopBtn["text"] = "O"
+        playerAktif = True
         check()
 
-def clicked4():
-    global turn
-    global cell
-    if turn == True and btn4["text"] == " " :
-        btn4["text"] = "X"
-        send_data = '{}-{}'.format('D','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
+def satuTiga():
+    global ans
+    global playerAktif
+    if rightTopBtn["text"] == " " and playerAktif == True:
+        rightTopBtn["text"] = "X"
+        kirim = '{}-{}'.format('c','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
         check()
-    elif turn == False and btn4["text"] == " " and cell == 'D':
-        btn4["text"] = "O"
-        turn = True
-        check()
-
-def clicked5():
-    global turn
-    global cell
-    if turn == True and btn5["text"] == " " :
-        btn5["text"] = "X"
-        send_data = '{}-{}'.format('E','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
-        check()
-    elif turn == False and btn5["text"] == " " and cell == 'E':
-        btn5["text"] = "O"
-        turn = True
+    elif ans == 'c' and playerAktif == False:
+        rightTopBtn["text"] = "O"
+        playerAktif = True
         check()
 
-def clicked6():
-    global turn
-    global cell
-    if turn == True and btn6["text"] == " " :
-        btn6["text"] = "X"
-        send_data = '{}-{}'.format('F','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
+def duaSatu():
+    global ans
+    global playerAktif
+    if leftCenterBtn["text"] == " " and playerAktif == True:
+        leftCenterBtn["text"] = "X"
+        kirim = '{}-{}'.format('d','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
         check()
-    elif turn == False and btn6["text"] == " " and cell == 'F':
-        btn6["text"] = "O"
-        turn = True
-        check()
-
-def clicked7():
-    global turn
-    global cell
-    if turn == True and btn7["text"] == " " :
-        btn7["text"] = "X"
-        send_data = '{}-{}'.format('G','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
-        check()
-    elif turn == False and btn7["text"] == " " and cell == 'G':
-        btn7["text"] = "O"
-        turn = True
+    elif ans == 'd' and playerAktif == False:
+        leftCenterBtn["text"] = "O"
+        playerAktif = True
         check()
 
-def clicked8():
-    global turn
-    global cell
-    if turn == True and btn8["text"] == " " :
-        btn8["text"] = "X"
-        send_data = '{}-{}'.format('H','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
+def duaDua():
+    global ans
+    global playerAktif
+    if centerCenterBtn["text"] == " " and playerAktif == True:
+        centerCenterBtn["text"] = "X"
+        kirim = '{}-{}'.format('e','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
         check()
-    elif turn == False and btn8["text"] == " " and cell == 'H':
-        btn8["text"] = "O"
-        turn = True
-        check()
-
-def clicked9():
-    global turn
-    global cell
-    if turn == True and btn9["text"] == " " :
-        btn9["text"] = "X"
-        send_data = '{}-{}'.format('I','YourTurn').encode()
-        conn.send(send_data)
-        print(send_data)
-        turn = False
-        check()
-    elif turn == False and btn9["text"] == " " and cell == 'I':
-        btn9["text"] = "O"
-        turn = True
+    elif ans == 'e' and playerAktif == False:
+        centerCenterBtn["text"] = "O"
+        playerAktif = True
         check()
 
-
-flag = 1
-def check():
-    global flag
-    b1 = btn1["text"]   # get the text of the button
-    b2 = btn2["text"]
-    b3 = btn3["text"]
-    b4 = btn4["text"]
-    b5 = btn5["text"]
-    b6 = btn6["text"]
-    b7 = btn7["text"]
-    b8 = btn8["text"]
-    b9 = btn9["text"]
-
-    flag = flag+1
+def duaTiga():
+    global ans
+    global playerAktif
+    if rightCenterBtn["text"] == " " and playerAktif == True:
+        rightCenterBtn["text"] = "X"
+        kirim = '{}-{}'.format('f','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
+        check()
+    elif ans == 'f' and playerAktif == False:
+        rightCenterBtn["text"] = "O"
+        playerAktif = True
+        check()
     
+def tigaSatu():
+    global ans
+    global playerAktif
+    if leftBottomBtn["text"] == " " and playerAktif == True:
+        leftBottomBtn["text"] = "X"
+        kirim = '{}-{}'.format('g','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
+        check()
+    elif ans == 'g' and playerAktif == False:
+        leftBottomBtn["text"] = "O"
+        playerAktif = True
+        check()
+
+def tigaDua():
+    global ans
+    global playerAktif
+    if centerBottomBtn["text"] == " " and playerAktif == True:
+        centerBottomBtn["text"] = "X"
+        kirim = '{}-{}'.format('h','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
+        check()
+    elif ans == 'h' and playerAktif == False:
+        centerBottomBtn["text"] = "O"
+        playerAktif = True
+        check()
+
+def tigaTiga():
+    global ans
+    global playerAktif
+    if rightBottomBtn["text"] == " " and playerAktif == True:
+        rightBottomBtn["text"] = "X"
+        kirim = '{}-{}'.format('i','YourTurn').encode()
+        clientsock.send(kirim)
+        playerAktif = False
+        check()
+    elif ans == 'i' and playerAktif == False:
+        rightBottomBtn["text"] = "O"
+        playerAktif = True
+        check()
+
+temp = 0
+def check():
+    global temp
+    button1 = leftTopBtn["text"]
+    button2 = centerTopBtn["text"]
+    button3 = rightTopBtn["text"]
+    button4 = leftCenterBtn["text"]
+    button5 = centerCenterBtn["text"]
+    button6 = rightCenterBtn["text"]
+    button7 = leftBottomBtn["text"]
+    button8 = centerBottomBtn["text"]
+    button9 = rightBottomBtn["text"]
+    temp += 1
+
     # Horizontal
-    if b1==b2 and b1==b3 and b1=="O" or b1==b2 and b1==b3 and b1=="X":
-        win(btn1["text"])
-    if b4==b5 and b4==b6 and b4=="O" or b4==b5 and b4==b6 and b4=="X":
-        win(btn4["text"])
-    if b7==b8 and b7==b9 and b7=="O" or b7==b8 and b7==b9 and b7=="X":
-        win(btn7["text"])
+    if (button1 == button2 and button1 == button3 and button1 == "O") or (button1 == button2 and button1 == button3 and button1 == "X"):
+        checkMenang(leftTopBtn["text"])
+    if (button4 == button5 and button4 == button6 and button4 == "O") or (button4 == button5 and button4 == button6 and button4 == "X"):
+        checkMenang(leftCenterBtn["text"])
+    if (button7 == button8 and button7 == button9 and button7 == "O") or (button7 == button8 and button7 == button9 and button7 == "X"):
+        checkMenang(leftBottomBtn["text"])
 
     # Vertical
-    if b1==b4 and b1==b7 and b1=="O" or b1==b4 and b1==b7 and b1=="X":
-        win(btn1["text"])
-    if b2==b5 and b2==b8 and b2=="O" or b2==b5 and b2==b8 and b2=="X":
-        win(btn2["text"])
-    if b3==b6 and b3==b9 and b3=="O" or b3==b6 and b3==b9 and b3=="X":
-        win(btn3["text"])
+    if (button1 == button4 and button1 == button7 and button1 == "O") or (button1 == button4 and button1 == button7 and button1 == "X"):
+        checkMenang(leftTopBtn["text"])
+    if (button2 == button5 and button2 == button8 and button2 == "O") or (button2 == button5 and button2 == button8 and button2 == "X"):
+        checkMenang(centerTopBtn["text"])
+    if (button3 == button6 and button3 == button9 and button3 == "O") or (button3 == button6 and button3 == button9 and button7 == "X"):
+        checkMenang(rightTopBtn["text"])
 
     # Diagonal
-    if b1==b5 and b1==b9 and b1=="O" or b1==b5 and b1==b9 and b1=="X":
-        win(btn1["text"])
-    if b7==b5 and b7==b3 and b7=="O" or b7==b5 and b7==b3 and b7=="X":
-        win(btn7["text"])
-    if flag == 10:
-        messagebox.showinfo("Tie", "Match Tied!! Try Again :D")
-        windows.destroy()
+    if (button1 == button5 and button1 == button9 and button1 == "O") or (button1 == button5 and button1 == button9 and button1 == "X"):
+        checkMenang(leftTopBtn["text"])
+    if (button7 == button5 and button7 == button3 and button7 == "O") or (button7 == button5 and button7 == button3 and button7 == "X"):
+        checkMenang(leftBottomBtn["text"])
 
-def win(player):
-    ans = "Game complete " + player + " wins "
-    messagebox.showinfo("Congratulations", ans)
-    windows.destroy()
+    if temp == 9:
+        messagebox.showinfo("permainan seri")
+        win.destroy()
+        # res = messagebox.askquestion("ingin bermain lagi?")
+        # if res == 'yes':
+        #     return 1 #clientThread(1)
+        # else:
+        #     sys.exit()
 
-# Buttons for the game
-btn1 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked1)
-btn1.grid(column=1, row=1)
+def checkMenang(ins):
+    ans = ins + " menang!"
+    messagebox.showinfo("ingin bermain lagi?", ans)
+    win.destroy()
+    # if res == 'yes':
+    #     return 1 #clientThread(1)
+    # else:
+    #     sys.exit()
 
-btn2 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked2)
-btn2.grid(column=2, row=1)
+#button grid#
 
-btn3 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked3)
-btn3.grid(column=3, row=1)
+#baris 1
 
-btn4 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked4)
-btn4.grid(column=1, row=2)
+leftTopBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = satuSatu)
+leftTopBtn.grid(column = 1, row = 1)
+centerTopBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = satuDua)
+centerTopBtn.grid(column = 2, row = 1)
+rightTopBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = satuTiga)
+rightTopBtn.grid(column = 3, row = 1)
 
-btn5 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked5)
-btn5.grid(column=2, row=2)
+#baris 2
+leftCenterBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = duaSatu)
+leftCenterBtn.grid(column = 1, row = 2)
+centerCenterBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = duaDua)
+centerCenterBtn.grid(column = 2, row = 2)
+rightCenterBtn = Button(win, text = " ", bg = "white", width = 6, height = 3,  command = duaTiga)
+rightCenterBtn.grid(column = 3, row = 2)
 
-btn6 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked6)
-btn6.grid(column=3, row=2)
+#baris 3
+leftBottomBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = tigaSatu)
+leftBottomBtn.grid(column = 1, row = 3)
+centerBottomBtn = Button(win, text = " ", bg = "white", width = 6, height = 3, command = tigaDua)
+centerBottomBtn.grid(column = 2, row = 3)
+rightBottomBtn = Button(win, text = " ", bg = "white", width = 6, height = 3,  command = tigaTiga)
+rightBottomBtn.grid(column = 3, row = 3)
 
-btn7 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked7)
-btn7.grid(column=1, row=3)
-
-btn8 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked8)
-btn8.grid(column=2, row=3)
-
-btn9 = Button(windows, text=" ", bg="white", fg="black", width=3, height=1, font=('Helvetica','20'), command=clicked9)
-btn9.grid(column=3, row=3)
-
-
-windows.mainloop()
+win.mainloop()
